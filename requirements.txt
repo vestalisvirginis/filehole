@@ -1,0 +1,5 @@
+holidays==0.14.2
+numpy==1.23.0
+pandas==1.4.3
+pyarrow==8.0.0
+pyspark==3.3.0

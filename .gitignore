@@ -2,6 +2,10 @@
 temp/
 .vscode/
 
+# Local files for software testing and built
+unit-requirements.txt
+build-requirements.txt
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
