@@ -1,6 +1,21 @@
 import re
 from datetime import date, datetime
 from typing import Protocol
+from dateutil.rrule import (
+    rrule,
+    DAILY,
+    WEEKLY,
+    MONTHLY,
+    YEARLY,
+    MO,
+    TU,
+    WE,
+    TH,
+    FR,
+    SA,
+    SU,
+)
+from dateutil.parser import parse
 
 import holidays
 import numpy as np
@@ -32,8 +47,75 @@ def _get_holidays(
     return [date for date in country_cal(subdiv=subdivision, years=years_of_interest)]
 
 
+def _get_busday_dateutil_format(busday_schedule: np.busdaycalendar) -> list:
+    '''
+    Return a list of busday for use with rrule function.
+    '''
+
+    dateutil_weekdays = np.array([MO, TU, WE, TH, FR, SA, SU])
+
+    return dateutil_weekdays[busday_schedule.weekmask].tolist()
+
+
+def _daily(strt_date: str, end_date: str, business_days: np.busdaycalendar) -> list:
+    """
+    Return a list of datetimes between the start and the end date based on given business days.
+    """
+
+    return [
+        d.date()
+        for d in rrule(
+            DAILY,
+            dtstart=parse(strt_date),
+            until=parse(end_date),
+            byweekday=_get_busday_dateutil_format(business_days),
+        )
+    ]
+
+
+def _weekly(
+    strt_date: str, end_date: str, business_days: np.busdaycalendar, repeat: int = 1
+) -> list:
+    """
+    Return a list of datetimes between the start and the end date based on given business days (one or several days can be selected) and repeat interval (by default, delivery event repeat every weeks for the selected days).
+    """
+    return [
+        d.date()
+        for d in rrule(
+            WEEKLY,
+            dtstart=parse(strt_date),
+            until=parse(end_date),
+            byweekday=_get_busday_dateutil_format(business_days),
+            interval=repeat,
+        )
+    ]
+
+
+def _monthly(
+    strt_date: str,
+    end_date: str,
+    business_days: np.busdaycalendar,
+    repeat: int = 1,
+    month_pos: int = 1,
+) -> list:
+    """
+    Return a list of datetimes between the start and the end date based on given business days and repeat interval (by default, every months). The `month_pos` allows the user to select either the first `1`
+    or the last `-1` business day of the month (default behaviour, first business day of the month is returned).
+    """
+    return [
+        d.date()
+        for d in rrule(
+            MONTHLY,
+            dtstart=parse(strt_date),
+            until=parse(end_date),
+            byweekday=_get_busday_dateutil_format(business_days),
+            interval=repeat,
+            bysetpos=month_pos,
+        )
+    ]
+
+
 def filehole(
-    spark: SparkSession,
     path_to_files: str,
     file_system: Globable,
     date_pattern: str,
@@ -42,16 +124,17 @@ def filehole(
     subdivision: str = None,
     start_date: str = f"{date.today().year}-01-01",
     end_date: str = date.today().strftime("%Y-%m-%d"),
-    frequency: str = "D",
-    date_boundary: str = "both",
     week_schedule: str = "1111100",
-) -> list:
+    frequency: str = 'D',
+    repetition: int =1,
+    position: int = 1,
+) -> list: 
     """
     Retrieve list of files from a given location.
     Extract dates from filenames.
     Create a calendar of holidays (optional).
-    Create a list of expected dates and compare them to the extracted dates.
-    Return a list of missing dates.
+    Create a set of expected dates and compare them to the extracted dates.
+    Return a set of missing dates.
     """
 
     # Extract dates from files or folder names.
@@ -71,36 +154,12 @@ def filehole(
     holidays_list = _get_holidays(country, subdivision, start_date, end_date)
     calendar = np.busdaycalendar(weekmask=week_schedule, holidays=holidays_list)
 
-    # Build dataframe of expected dates
-    expected_dates_df = spark.createDataFrame(
-        pd.bdate_range(
-            start_date,
-            end_date,
-            freq=frequency,
-            weekmask=week_schedule,
-            holidays=calendar.holidays,
-            inclusive=date_boundary,
-        ).to_frame(name="FULL_SCHEDULE")
-    )
-
-    # Check for the missing dates
-    df = spark.createDataFrame(
-        [[value1] for value1 in date_list],
-        [
-            "EXTRACTED_DATE",
-        ],
-    )
-
-    return sorted(
-        [
-            x[0]
-            for x in df.join(
-                expected_dates_df,
-                F.col("EXTRACTED_DATE") == F.col("FULL_SCHEDULE"),
-                "right",
-            )
-            .filter(F.col("EXTRACTED_DATE").isNull())
-            .select("FULL_SCHEDULE")
-            .toLocalIterator()
-        ]
-    )
+    # Missing dates
+    if frequency == 'D':
+        return set(_daily(start_date, end_date, calendar)).difference(set(calendar.holidays.tolist()).union(set(date_list)))
+    elif frequency == 'W':
+        return set(_weekly(start_date, end_date, calendar, repetition)).difference(set(calendar.holidays.tolist()).union(set(date_list)))
+    elif frequency == 'M':
+        return set(_monthly(start_date, end_date, calendar, repetition, position)).difference(set(calendar.holidays.tolist()).union(set(date_list)))
+    else:
+        return f'Frequency error'
