@@ -37,14 +37,17 @@ def _get_holidays(
 ) -> list:
     """Get the list of holidays for a given country or state between a range of dates."""
 
+    begin = date.fromisoformat(start_date)
+    end = date.fromisoformat(end_date)
+    
     years_of_interest = list(
         range(
-            date.fromisoformat(start_date).year, date.fromisoformat(end_date).year + 1
+            begin.year, end.year + 1
         )
     )
     country_cal = getattr(holidays, country)
 
-    return [date for date in country_cal(subdiv=subdivision, years=years_of_interest)]
+    return [hdate for hdate in country_cal(subdiv=subdivision, years=years_of_interest) if begin<=hdate<=end]
 
 
 def _get_busday_dateutil_format(busday_schedule: np.busdaycalendar) -> list:
