@@ -1,4 +1,7 @@
 import re
+import holidays
+import numpy as np
+
 from datetime import date, datetime
 from typing import Protocol
 from dateutil.rrule import (
@@ -6,7 +9,6 @@ from dateutil.rrule import (
     DAILY,
     WEEKLY,
     MONTHLY,
-    YEARLY,
     MO,
     TU,
     WE,
@@ -17,16 +19,14 @@ from dateutil.rrule import (
 )
 from dateutil.parser import parse
 
-import holidays
-import numpy as np
-import pandas as pd
-import pyspark.sql.functions as F
-from pyspark.sql import SparkSession
-
 
 class Globable(Protocol):
-    def glob(str):
+    def glob(path: str):
         pass
+
+
+class FrequencyException(Exception):
+    pass
 
 
 def _get_holidays(
@@ -39,21 +39,21 @@ def _get_holidays(
 
     begin = date.fromisoformat(start_date)
     end = date.fromisoformat(end_date)
-    
-    years_of_interest = list(
-        range(
-            begin.year, end.year + 1
-        )
-    )
+
+    years_of_interest = list(range(begin.year, end.year + 1))
     country_cal = getattr(holidays, country)
 
-    return [hdate for hdate in country_cal(subdiv=subdivision, years=years_of_interest) if begin<=hdate<=end]
+    return [
+        hdate
+        for hdate in country_cal(subdiv=subdivision, years=years_of_interest)
+        if begin <= hdate <= end
+    ]
 
 
 def _get_busday_dateutil_format(busday_schedule: np.busdaycalendar) -> list:
-    '''
+    """
     Return a list of busday for use with rrule function.
-    '''
+    """
 
     dateutil_weekdays = np.array([MO, TU, WE, TH, FR, SA, SU])
 
@@ -128,10 +128,10 @@ def filehole(
     start_date: str = f"{date.today().year}-01-01",
     end_date: str = date.today().strftime("%Y-%m-%d"),
     week_schedule: str = "1111100",
-    frequency: str = 'D',
-    repetition: int =1,
+    frequency: str = "D",
+    repetition: int = 1,
     position: int = 1,
-) -> list: 
+) -> set:
     """
     Retrieve list of files from a given location.
     Extract dates from filenames.
@@ -158,11 +158,17 @@ def filehole(
     calendar = np.busdaycalendar(weekmask=week_schedule, holidays=holidays_list)
 
     # Missing dates
-    if frequency == 'D':
-        return set(_daily(start_date, end_date, calendar)).difference(set(calendar.holidays.tolist()).union(set(date_list)))
-    elif frequency == 'W':
-        return set(_weekly(start_date, end_date, calendar, repetition)).difference(set(calendar.holidays.tolist()).union(set(date_list)))
-    elif frequency == 'M':
-        return set(_monthly(start_date, end_date, calendar, repetition, position)).difference(set(calendar.holidays.tolist()).union(set(date_list)))
+    if frequency == "D":
+        return set(_daily(start_date, end_date, calendar)).difference(
+            set(calendar.holidays.tolist()).union(set(date_list))
+        )
+    elif frequency == "W":
+        return set(_weekly(start_date, end_date, calendar, repetition)).difference(
+            set(calendar.holidays.tolist()).union(set(date_list))
+        )
+    elif frequency == "M":
+        return set(
+            _monthly(start_date, end_date, calendar, repetition, position)
+        ).difference(set(calendar.holidays.tolist()).union(set(date_list)))
     else:
-        return f'Frequency error'
+        raise FrequencyException("📐 frequency accepts only the following values: 'D', 'W' and 'M'")
