@@ -98,6 +98,26 @@ def test_filehole_daily():
     assert len(rs) == 0
 
 
+def test_filehole_missing_file():
+
+    rs = filehole(
+        path_to_files="tests/fixtures/negative/daily_file_delivery/*.txt",
+        file_system=glob,
+        date_pattern=r"[0-9]{8}",
+        date_format="%Y%m%d",
+        country="FR",
+        subdivision=None,
+        start_date="2022-01-01",
+        end_date="2022-07-12",
+        week_schedule="1111100",
+        frequency="D",
+    )
+
+    assert isinstance(rs, set)
+    assert len(rs) == 1
+    assert rs == {datetime(2022,5,12).date()}
+
+
 def test_filehole_weekly():
 
     rs = filehole(
