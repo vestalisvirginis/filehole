@@ -22,7 +22,7 @@ from dateutil.parser import parse
 
 class Globable(Protocol):
     def glob(path: str):
-        pass
+        pass  #pragma: no cover
 
 
 class FrequencyException(Exception):
