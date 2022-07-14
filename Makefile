@@ -6,6 +6,8 @@ clean: # Remove workspace files
 	@find . -name "__pycache__" -exec rm -rf {} + 
 	@rm -rf ./.pytest_cache
 	@rm -rf ./filehole.egg-info
+	@rm -rf ./htmlcov
+	@find . -name ".DS_Store" -exec rm -rf {} +
 	@python -c "print('Cleaning: 👌')"
 
 cov: # Run test and coverage
