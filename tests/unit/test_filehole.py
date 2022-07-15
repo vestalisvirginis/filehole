@@ -98,6 +98,45 @@ def test_filehole_daily():
     assert len(rs) == 0
 
 
+def test_filehole_daily_with_date_in_folder_name():
+
+    rs = filehole(
+        path_to_files="tests/fixtures/positive/date_in_folder_name/*/*.txt",
+        file_system=glob,
+        date_pattern=r"[0-9]{4}-[0-9]{2}-[0-9]{2}",
+        date_format="%Y-%m-%d",
+        country="FR",
+        subdivision=None,
+        start_date="2022-07-01",
+        end_date="2022-07-31",
+        week_schedule="1111100",
+        frequency="D",
+    )
+
+    assert isinstance(rs, set)
+    assert len(rs) == 0
+
+
+def test_filehole_daily_with_date_discrepency():
+
+    rs = filehole(
+        path_to_files="tests/fixtures/negative/date_discrepency/*/*.txt",
+        file_system=glob,
+        date_pattern=r"[0-9]{4}-[0-9]{2}-[0-9]{2}",
+        date_format="%Y-%m-%d",
+        country="FR",
+        subdivision=None,
+        start_date="2022-07-01",
+        end_date="2022-07-31",
+        week_schedule="1111100",
+        frequency="D",
+    )
+
+    assert isinstance(rs, set)
+    assert len(rs) == 1
+    assert rs == {datetime(2022,7,13).date()}
+
+
 def test_filehole_missing_file():
 
     rs = filehole(
