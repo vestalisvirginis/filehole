@@ -8,6 +8,7 @@ clean: # Remove workspace files
 	@rm -rf ./filehole.egg-info
 	@rm -rf ./htmlcov
 	@find . -name ".DS_Store" -exec rm -rf {} +
+	@rm -rf ./dist
 	@python -c "print('Cleaning: 👌')"
 
 cov: # Run test and coverage

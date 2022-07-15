@@ -5,6 +5,7 @@ temp/
 # Local files for software testing and built
 unit-requirements.txt
 build-requirements.txt
+Makefile_2
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
