@@ -41,18 +41,18 @@ filehole(
 
 ### Parameters:
 
-- __path_to_files__ : Wild card enabled string to search for files  
-- __file_system__ : Modules that have a `glob` function such as `glob` in a local environment or `adls` in a cloud environment.
-- __date_patter__ : Regular expression reflecting the pattern in which the date is written in files or directories.
--  __date_format__ : Standard date format of the date written in files or directories.
--  __country__: Country name or abbreviation for the selection of the holidays calendar. For the exhaustive list of available holidays calendars, please refer to the documentation of the `holidays` python library (https://pypi.org/project/holidays/).
--  __subdivision__ : Province, state, ... for the selection of the holidays calendar. The available option can be found in the documentation of the `holidays` python library (https://pypi.org/project/holidays/).
--  __start_date__ : Start of the search period. Format: "%Y-%m-%d". Default is set to the first day of the current year.
--  __end_date__ : End of the search period. Format: "%Y-%m-%d". Default is set to the current date.
--  __week_schedule__: String of 7 digits of 0 and 1. 1 represents a working day and 0 a non-working day. Week starts on Monday. By default, the working week is set from Monday to Friday included -> '1111100'.
--  __frequency__ : Takes 'D' for daily delivery, 'W' for weekly delivery and 'M' for monthly delivery.
--  __repetition__ : Default value: 1. Used only for weekly and monthly file delivery. e.g.: repetition=1 -> every week/month, repetition=2 -> every two weeks/months...
--  __position__ : Takes 1 for first business day of the month or -1 for last business day of the month.
+- `path_to_files` : Wild card enabled string to search for files  
+- `file_system` : Modules that have a `glob` function such as `glob` in a local environment or `adls` in a cloud environment.
+- `date_patter` : Regular expression reflecting the pattern in which the date is written in files or directories.
+- `date_format` : Standard date format of the date written in files or directories.
+- `country` : Country name or abbreviation for the selection of the holidays calendar. For the exhaustive list of available holidays calendars, please refer to the documentation of the `holidays` python library (https://pypi.org/project/holidays/).
+- `subdivision` : Province, state, ... for the selection of the holidays calendar. The available option can be found in the documentation of the `holidays` python library (https://pypi.org/project/holidays/).
+-  `start_date` : Start of the search period. Format: `'%Y-%m-%d'`. Default is set to the first day of the current year.
+-  `end_date` : End of the search period. Format: `'%Y-%m-%d'`. Default is set to the current date.
+-  `week_schedule`: String of 7 digits of 0 and 1. 1 represents a working day and 0 a non-working day. Week starts on Monday. By default, the working week is set from Monday to Friday included -> `'1111100'`.
+-  `frequency` : Takes `'D'` for daily delivery, `'W'` for weekly delivery and `'M'` for monthly delivery.
+-  `repetition` : Default value: `1`. Used only for weekly and monthly file delivery. e.g.: `repetition=1` -> every week/month, `repetition=2` -> every two weeks/months...
+-  `position` : Takes `1` for first business day of the month or `-1` for last business day of the month.
 
 
 ### Description:
