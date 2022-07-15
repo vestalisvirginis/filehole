@@ -43,7 +43,7 @@ filehole(
 
 - `path_to_files` : Wild card enabled string to search for files  
 - `file_system` : Modules that have a `glob` function such as `glob` in a local environment or `adls` in a cloud environment.
-- `date_patter` : Regular expression reflecting the pattern in which the date is written in files or directories.
+- `date_pattern` : Regular expression reflecting the pattern in which the date is written in files or directories.
 - `date_format` : Standard date format of the date written in files or directories.
 - `country` : Country name or abbreviation for the selection of the holidays calendar. For the exhaustive list of available holidays calendars, please refer to the documentation of the `holidays` python library (https://pypi.org/project/holidays/).
 - `subdivision` : Province, state, ... for the selection of the holidays calendar. The available option can be found in the documentation of the `holidays` python library (https://pypi.org/project/holidays/).
