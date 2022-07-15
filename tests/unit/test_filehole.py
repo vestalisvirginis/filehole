@@ -134,7 +134,7 @@ def test_filehole_daily_with_date_discrepency():
 
     assert isinstance(rs, set)
     assert len(rs) == 1
-    assert rs == {datetime(2022,7,13).date()}
+    assert rs == {datetime(2022, 7, 13).date()}
 
 
 def test_filehole_missing_file():
@@ -154,7 +154,7 @@ def test_filehole_missing_file():
 
     assert isinstance(rs, set)
     assert len(rs) == 1
-    assert rs == {datetime(2022,5,12).date()}
+    assert rs == {datetime(2022, 5, 12).date()}
 
 
 def test_filehole_weekly():
@@ -217,7 +217,10 @@ def test_filehole_monthly_last_busday():
 
 
 def test_filehole_unknown_frequency():
-    with pytest.raises(FrequencyException, match="📐 frequency accepts only the following values: 'D', 'W' and 'M'"):
+    with pytest.raises(
+        FrequencyException,
+        match="📐 frequency accepts only the following values: 'D', 'W' and 'M'",
+    ):
         rs = filehole(
             path_to_files="tests/fixtures/positive/daily_file_delivery/*.txt",
             file_system=glob,

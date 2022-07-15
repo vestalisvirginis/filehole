@@ -21,8 +21,8 @@ from dateutil.parser import parse
 
 
 class Globable(Protocol):
-    def glob(path: str):
-        pass  #pragma: no cover
+    def glob(self, path: str):
+        pass  # pragma: no cover
 
 
 class FrequencyException(Exception):
@@ -171,4 +171,6 @@ def filehole(
             _monthly(start_date, end_date, calendar, repetition, position)
         ).difference(set(calendar.holidays.tolist()).union(set(date_list)))
     else:
-        raise FrequencyException("📐 frequency accepts only the following values: 'D', 'W' and 'M'")
+        raise FrequencyException(
+            "📐 frequency accepts only the following values: 'D', 'W' and 'M'"
+        )
