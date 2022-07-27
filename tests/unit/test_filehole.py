@@ -94,7 +94,7 @@ def test_filehole_daily():
         frequency="D",
     )
 
-    assert isinstance(rs, set)
+    assert isinstance(rs, list)
     assert len(rs) == 0
 
 
@@ -113,7 +113,7 @@ def test_filehole_daily_with_date_in_folder_name():
         frequency="D",
     )
 
-    assert isinstance(rs, set)
+    assert isinstance(rs, list)
     assert len(rs) == 0
 
 
@@ -132,9 +132,9 @@ def test_filehole_daily_with_date_discrepency():
         frequency="D",
     )
 
-    assert isinstance(rs, set)
+    assert isinstance(rs, list)
     assert len(rs) == 1
-    assert rs == {datetime(2022, 7, 13).date()}
+    assert rs == [datetime(2022, 7, 13).date()]
 
 
 def test_filehole_missing_file():
@@ -152,9 +152,10 @@ def test_filehole_missing_file():
         frequency="D",
     )
 
-    assert isinstance(rs, set)
-    assert len(rs) == 1
-    assert rs == {datetime(2022, 5, 12).date()}
+    assert isinstance(rs, list)
+    assert len(rs) == 2
+    assert rs == [datetime(2022, 2, 3).date(), datetime(2022, 5, 12).date()]
+    assert rs != [datetime(2022, 5, 12).date(), datetime(2022, 2, 3).date()]
 
 
 def test_filehole_weekly():
@@ -172,7 +173,7 @@ def test_filehole_weekly():
         frequency="W",
     )
 
-    assert isinstance(rs, set)
+    assert isinstance(rs, list)
     assert len(rs) == 0
 
 
@@ -192,7 +193,7 @@ def test_filehole_monthly_first_busday():
         position=1,
     )
 
-    assert isinstance(rs, set)
+    assert isinstance(rs, list)
     assert len(rs) == 0
 
 
@@ -212,7 +213,7 @@ def test_filehole_monthly_last_busday():
         position=-1,
     )
 
-    assert isinstance(rs, set)
+    assert isinstance(rs, list)
     assert len(rs) == 0
 
 

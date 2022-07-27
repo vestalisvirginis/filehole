@@ -131,13 +131,13 @@ def filehole(
     frequency: str = "D",
     repetition: int = 1,
     position: int = 1,
-) -> set:
+) -> list:
     """
     Retrieve list of files from a given location.
     Extract dates from filenames.
     Create a calendar of holidays (optional).
     Create a set of expected dates and compare them to the extracted dates.
-    Return a set of missing dates.
+    Return a sorted list of missing dates.
     """
 
     # Extract dates from files or folder names.
@@ -159,17 +159,17 @@ def filehole(
 
     # Missing dates
     if frequency == "D":
-        return set(_daily(start_date, end_date, calendar)).difference(
+        return sorted(set(_daily(start_date, end_date, calendar)).difference(
             set(calendar.holidays.tolist()).union(set(date_list))
-        )
+        ))
     elif frequency == "W":
-        return set(_weekly(start_date, end_date, calendar, repetition)).difference(
+        return sorted(set(_weekly(start_date, end_date, calendar, repetition)).difference(
             set(calendar.holidays.tolist()).union(set(date_list))
-        )
+        ))
     elif frequency == "M":
-        return set(
+        return sorted(set(
             _monthly(start_date, end_date, calendar, repetition, position)
-        ).difference(set(calendar.holidays.tolist()).union(set(date_list)))
+        ).difference(set(calendar.holidays.tolist()).union(set(date_list))))
     else:
         raise FrequencyException(
             "📐 frequency accepts only the following values: 'D', 'W' and 'M'"
