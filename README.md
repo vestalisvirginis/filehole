@@ -61,7 +61,7 @@ Retrieve list of files from a given location.
 Extract dates from filenames.  
 Create a calendar of holidays.  
 Create a set of expected dates and compare them to the extracted dates.  
-Return a set of missing dates.
+Return a sorted list of missing dates.
 
 
 ### Example: 
