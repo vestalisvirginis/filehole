@@ -123,8 +123,9 @@ def filehole(
     file_system: Globable,
     date_pattern: str,
     date_format: str,
-    country: str,
+    country: str = None,
     subdivision: str = None,
+    custom_holidays: list = None,
     start_date: str = f"{date.today().year}-01-01",
     end_date: str = date.today().strftime("%Y-%m-%d"),
     week_schedule: str = "1111100",
@@ -154,22 +155,34 @@ def filehole(
     )
 
     # Build a calendar based on start/end dates, week and holiday schedule.
-    holidays_list = _get_holidays(country, subdivision, start_date, end_date)
-    calendar = np.busdaycalendar(weekmask=week_schedule, holidays=holidays_list)
+    if country is not None:
+        holidays_list = _get_holidays(country, subdivision, start_date, end_date)
+        calendar = np.busdaycalendar(
+            weekmask=week_schedule, holidays=holidays_list + custom_holidays
+        )
+    else:
+        calendar = np.busdaycalendar(weekmask=week_schedule, holidays=custom_holidays)
+
+    # List of dates to exclude
+    excluded_dates = set(calendar.holidays.tolist()).union(set(date_list))
 
     # Missing dates
     if frequency == "D":
-        return sorted(set(_daily(start_date, end_date, calendar)).difference(
-            set(calendar.holidays.tolist()).union(set(date_list))
-        ))
+        return sorted(
+            set(_daily(start_date, end_date, calendar)).difference(excluded_dates)
+        )
     elif frequency == "W":
-        return sorted(set(_weekly(start_date, end_date, calendar, repetition)).difference(
-            set(calendar.holidays.tolist()).union(set(date_list))
-        ))
+        return sorted(
+            set(_weekly(start_date, end_date, calendar, repetition)).difference(
+                excluded_dates
+            )
+        )
     elif frequency == "M":
-        return sorted(set(
-            _monthly(start_date, end_date, calendar, repetition, position)
-        ).difference(set(calendar.holidays.tolist()).union(set(date_list))))
+        return sorted(
+            set(
+                _monthly(start_date, end_date, calendar, repetition, position)
+            ).difference(excluded_dates)
+        )
     else:
         raise FrequencyException(
             "📐 frequency accepts only the following values: 'D', 'W' and 'M'"
